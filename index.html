@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EU TE VIVO</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Arial Black', sans-serif;
+      touch-action: manipulation;
+      height: 100vh;
+    }
+
+    .cachoeira {
+      position: absolute;
+      font-weight: 900;
+      color: #FF1493;
+      animation: cair 7s linear forwards;
+      pointer-events: none;
+      text-shadow: 
+        0 0 10px #FF69B4,
+        0 0 20px rgba(255, 105, 180, 0.8);
+      opacity: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+      left: var(--left);
+      transform: translateX(-50%);
+    }
+
+    .cachoeira span {
+      display: inline-block;
+    }
+
+    .cachoeira .middle {
+      font-size: 0.8em;
+      transform: translateY(0.1em);
+    }
+
+    @keyframes cair {
+      0% { 
+        transform: translate(-50%, -100px) rotateZ(var(--rot));
+        opacity: 1;
+      }
+      100% { 
+        transform: translate(-50%, 120vh) rotateZ(var(--rot));
+        opacity: 0;
+      }
+    }
+
+    .mensagem-toque {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 72px;
+      font-weight: 900;
+      color: #FF00AA;
+      text-shadow: 
+        0 0 15px #FF69B4, 
+        0 0 30px #FF1493,
+        0 0 45px #FF00FF;
+      text-transform: uppercase;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.5s;
+      pointer-events: none;
+      z-index: 100;
+      text-align: center;
+    }
+
+    .mensagem-toque .middle {
+      font-size: 0.8em;
+      transform: translateY(0.1em);
+    }
+
+    .mensagem-toque.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .efeito-toque {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 0, 170, 0.6);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: ripple 1s ease-out forwards;
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(15);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="mensagem-toque" id="mensagemToque">
+    <span>EU</span> <span class="middle">TE</span> <span>AMO</span>
+  </div>
+
+  <script>
+    const colunas = 8;
+    const posicoesColunas = Array.from({length: colunas}, (_, i) => 
+      Math.floor((i + 1) * (100 / (colunas + 1)) * 10) / 10
+    );
+
+    function criarCachoeiraOrganizada() {
+      posicoesColunas.forEach((posicao, index) => {
+        setTimeout(() => {
+          const frase = document.createElement('div');
+          frase.className = 'cachoeira';
+          frase.innerHTML = `
+            <span>EU</span>
+            <span class="middle">TE</span>
+            <span>VIVO</span>
+          `;
+          frase.style.setProperty('--left', posicao + '%');
+          frase.style.setProperty('--rot', (Math.random() * 10 - 5) + 'deg');
+          frase.style.fontSize = (28 + Math.random() * 8) + 'px';
+          document.body.appendChild(frase);
+          setTimeout(() => frase.remove(), 7000);
+        }, index * 300);
+      });
+    }
+
+    setInterval(criarCachoeiraOrganizada, 1500);
+
+    function mostrarMensagem(x, y) {
+      const mensagem = document.getElementById('mensagemToque');
+      mensagem.style.left = x + 'px';
+      mensagem.style.top = y + 'px';
+      
+      const ripple = document.createElement('div');
+      ripple.className = 'efeito-toque';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      document.body.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 1000);
+      
+      mensagem.classList.add('visible');
+      setTimeout(() => mensagem.classList.remove('visible'), 1500);
+    }
+
+    document.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      mostrarMensagem(touch.clientX, touch.clientY);
+    });
+
+    document.addEventListener('click', (e) => {
+      mostrarMensagem(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('gesturestart', (e) => {
+      e.preventDefault();
+    });
+  </script>
+</body>
+</html>
